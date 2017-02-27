@@ -1,19 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="32" tileheight="32" nextobjectid="2">
- <tileset firstgid="1" source="chip_challenge.tsx"/>
- <layer name="Tile Layer 1" width="16" height="16">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="32" tileheight="32" nextobjectid="6">
+ <tileset firstgid="1" name="chip_challenge" tilewidth="32" tileheight="32" tilecount="208" columns="13">
+  <image source="Color_Tileset.png" width="416" height="512"/>
+  <tile id="0">
+   <properties>
+    <property name="Solid" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="Push" type="bool" value="true"/>
+    <property name="Solid" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="Solid" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="41">
+   <properties>
+    <property name="Solid" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="54">
+   <properties>
+    <property name="Solid" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="66">
+   <animation>
+    <frame tileid="66" duration="200"/>
+    <frame tileid="146" duration="200"/>
+    <frame tileid="133" duration="200"/>
+   </animation>
+  </tile>
+  <tile id="92">
+   <properties>
+    <property name="Solid" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="105">
+   <properties>
+    <property name="Solid" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Background" width="16" height="16" visible="0">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,
-1,1,1,1,14,1,1,1,1,1,14,1,1,1,1,1,
-2,1,1,1,14,1,1,1,1,1,14,1,1,1,1,1,
-42,1,1,1,106,1,1,1,1,1,93,1,1,1,1,134,
-55,1,1,1,14,1,1,1,1,1,14,1,1,1,1,1,
-1,1,1,1,14,1,1,1,1,1,14,1,1,1,1,1,
-14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -21,7 +66,59 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
- <objectgroup name="objects">
+ <layer name="Foreground" width="16" height="16" visible="0">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,
+0,0,0,0,14,0,0,0,0,0,14,0,0,0,0,0,
+0,0,0,0,14,0,0,0,0,0,14,0,0,0,0,0,
+42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,
+55,0,0,0,14,0,0,0,0,0,14,0,0,0,0,0,
+0,0,0,0,14,0,0,0,0,0,14,0,0,0,0,0,
+14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer name="Dynamic" width="16" height="16" visible="0">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,106,0,0,0,0,0,93,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup name="Meta" visible="0">
   <object id="1" name="SpawnPoint" x="40" y="229" width="15" height="18"/>
+  <object id="2" name="GreenButton" x="6" y="233" width="19" height="15">
+   <properties>
+    <property name="enter_trigger" value="RM 4,7"/>
+    <property name="exit_trigger" value="RESTORE 4,7"/>
+   </properties>
+  </object>
+  <object id="4" name="RedButton" x="7" y="264" width="17" height="17">
+   <properties>
+    <property name="enter_trigger" value="RM 10,7"/>
+    <property name="exit_trigger" value="RESTORE 10,7"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

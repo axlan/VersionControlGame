@@ -8,6 +8,8 @@
 #include <memory>
 #include <assert.h>
 
+#include "Util.h"
+
 class TestNode;
 
 typedef std::shared_ptr<TestNode> TestNodePtr;
@@ -90,27 +92,10 @@ protected:
 
 
 
-
-
 USING_NS_CC;
 
 
-struct Point2D
-{
-  int32_t x;
-  int32_t y;
-};
 
-uint64_t Point2Key(int32_t x, int32_t y)
-{
-  return (int64_t(x) << 32ull) + int64_t(y);
-}
-
-
-uint64_t Point2Key(Point2D val)
-{
-  return Point2Key(val.x, val.y);
-}
 
 
 // on "init" you need to initialize your instance
@@ -158,20 +143,15 @@ bool GraphNode::init()
 	return true;
 }
 
-
 const int x_space = 30;
 const int y_space = 30;
 const int radius = 10;
 const int offset = 10;
 
-
-Point2D Pixel2Point(int x, int y)
+static Point2D Pixel2Point(int x, int y)
 {
-  int point_x = int(float(x - offset) / x_space + .5);
-  int point_y = int(float(y - offset) / y_space + .5);
-  return Point2D{ point_x, point_y };
+  return Pixel2Point(x, y, offset, offset, x_space, y_space);
 }
-
 
 void GraphNode::on_mouse_down(cocos2d::Event* event) {
   try {
@@ -179,14 +159,14 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
     mouseEvent->getMouseButton();
     std::stringstream message;
 
-    CCPoint touchLocation = mouseEvent->getLocationInView();
+    Point touchLocation = mouseEvent->getLocationInView();
     //touchLocation = CCDirector::sharedDirector()->convertToGL(touchLocation);
     touchLocation = convertToNodeSpace(touchLocation);
-    CCLOG(" TouchLocation X=%f TouchLocation Y=%f", touchLocation.x, touchLocation.y);
+    //CCLOG(" TouchLocation X=%f TouchLocation Y=%f", touchLocation.x, touchLocation.y);
 
     Point2D point = Pixel2Point(touchLocation.x, touchLocation.y);
 
-    CCLOG(" point X=%d point Y=%d", point.x, point.y);
+    //CCLOG(" point X=%d point Y=%d", point.x, point.y);
 
     uint64_t key = Point2Key(point);
 
@@ -209,6 +189,7 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
     */
   }
   catch (std::bad_cast& e) {
+    log(e.what());
     // Not sure what kind of event you passed us cocos, but it was the wrong one
     return;
   }

@@ -24,7 +24,13 @@
     <ClCompile Include="..\Classes\GraphNode.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="GameBoard.cpp">
+    <ClCompile Include="..\Classes\HudLayer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\GameBoard.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Util.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +47,13 @@
     <ClInclude Include="..\Classes\GraphNode.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="GameBoard.h">
+    <ClInclude Include="..\Classes\HudLayer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameBoard.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Util.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
