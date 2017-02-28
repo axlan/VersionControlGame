@@ -1,5 +1,5 @@
 #include "GraphNode.h"
-
+#include "GameBoard.h"
 
 //////////////////GRAPH CODE///////////////////////////////////////////
 
@@ -62,6 +62,8 @@ public:
     return parent_->branch_id_;
   }
 
+  GameState game_state;
+
 protected:
   TestNode(int max_branches) : max_branches_(max_branches), parent_(nullptr), t_(0)
   {
@@ -117,6 +119,8 @@ bool GraphNode::init()
 
   root = TestNode::MakeRoot(7);
 
+  _selected = root;
+
 
   auto listener = EventListenerMouse::create();
   listener->onMouseDown = CC_CALLBACK_1(GraphNode::on_mouse_down, this);
@@ -135,10 +139,6 @@ bool GraphNode::init()
   };
 
   _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
-
-  need_update = true;
-
-  this->scheduleUpdate();
 
 	return true;
 }
@@ -177,7 +177,7 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
       else {
         point_map[key]->Delete();
       }
-      need_update = true;
+	  update_nodes();
     }
 
     
@@ -195,16 +195,22 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
   }
 }
 
+void GraphNode::UpdateGameState(const GameState& state)
+{
+	_selected->game_state = state;
 
+}
 
-void GraphNode::update(float delta) {
+void GraphNode::AddGameState(const GameState& state)
+{
+	_selected = _selected->AddChild();
+	_selected->game_state = state;
+	update_nodes();
+}
 
-  if (!need_update) {
-    return;
-  }
+void GraphNode::update_nodes() {
+
   boundLines->clear();
-
-  need_update = false;
 
   auto bounds = this->getContentSize();
   int max_x = bounds.width - 1;

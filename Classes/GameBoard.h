@@ -35,6 +35,7 @@ struct GameState
 	Point2D plater_pos;
 };
 
+class GraphNode;
 
 class GameBoard : public cocos2d::Node
 {
@@ -47,6 +48,8 @@ public:
   void on_mouse_down(cocos2d::Event* event);
   //virtual void on_mouse_down(cocos2d::Event* event);
   void on_key_down(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
+
+  void set_graph_node(GraphNode* graph_node);
 
 private:
   GameState _game_state;
@@ -70,4 +73,5 @@ private:
   bool IsTileInbounds(const Point2D& position);
   void setViewPointCenter(cocos2d::Point position);
   void RerunTriggers();
+  GraphNode* _graph_node;
 };
