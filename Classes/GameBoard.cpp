@@ -3,6 +3,54 @@
 
 USING_NS_CC;
 
+////////////////////////////Static///////////////////////////////////////////////////
+
+static int IntFromPoint(Point point, const TMXLayer* layer)
+{
+	return static_cast<int>(point.x + layer->getLayerSize().width * point.y);
+}
+
+
+static void CopyLayerState(TMXLayer* layer, Map2D& tiles) {
+	for (int row = 0; row < layer->getLayerSize().height; row++) {
+		for (int col = 0; col < layer->getLayerSize().width; col++) {
+			Point pos(col, row);
+			int tile_gid = layer->getTileGIDAt(Point(col, row));
+			if (tile_gid) {
+				tiles[IntFromPoint(pos, layer)] = tile_gid;
+			}
+		}
+	}
+}
+
+
+static void RestoreLayerState(TMXLayer* layer, Map2D& tiles) {
+	for (int row = 0; row < layer->getLayerSize().height; row++) {
+		for (int col = 0; col < layer->getLayerSize().width; col++) {
+			Point pos(col, row);
+			int tile_gid = layer->getTileGIDAt(Point(col, row));
+			int stored_gid;
+			int int_pos = IntFromPoint(pos, layer);
+			if (tiles.count(int_pos) == 0) {
+				stored_gid = 0;
+			}
+			else {
+				stored_gid = tiles[int_pos];
+			}
+			if (tile_gid != stored_gid) {
+				if (!stored_gid) {
+					layer->removeTileAt(pos);
+				}
+				else {
+					layer->setTileGID(stored_gid, pos);
+				}
+			}
+		}
+	}
+}
+
+//////////////////////////////////////TriggerCmd///////////////////////////////////////////////////
+
 TriggerCmd::TriggerCmd():type(Type::NONE) {}
 
 TriggerCmd::TriggerCmd(const std::string& cmd_str, TMXLayer* layer)
@@ -39,50 +87,7 @@ Point TriggerCmd::ParsePoint(const std::string& word)
 }
 
 
-
-int IntFromPoint(Point point, const TMXLayer* layer) 
-{
-  return static_cast<int>(point.x + layer->getLayerSize().width * point.y);
-}
-
-
-void CopyLayerState(TMXLayer* layer, Map2D& tiles) {
-  for (int row = 0; row < layer->getLayerSize().height; row++) {
-    for (int col = 0; col < layer->getLayerSize().width; col++) {
-      Point pos(col, row);
-      int tile_gid = layer->getTileGIDAt(Point(col, row));
-      if (tile_gid) {
-        tiles[IntFromPoint(pos, layer)] = tile_gid;
-      }
-    }
-  }
-}
-
-
-void RestoreLayerState(TMXLayer* layer, Map2D& tiles) {
-  for (int row = 0; row < layer->getLayerSize().height; row++) {
-    for (int col = 0; col < layer->getLayerSize().width; col++) {
-      Point pos(col, row);
-      int tile_gid = layer->getTileGIDAt(Point(col, row));
-      int stored_gid;
-      int int_pos = IntFromPoint(pos, layer);
-      if (tiles.count(int_pos) == 0) {
-        stored_gid = 0;
-      }
-      else {
-        stored_gid = tiles[int_pos];
-      }
-      if (tile_gid != stored_gid) {
-        if (!stored_gid) {
-          layer->removeTileAt(pos);
-        }
-        else {
-          layer->setTileGID(stored_gid, pos);
-        }
-      }
-    }
-  }
-}
+///////////////////////////////////////////////////GameBoard///////////////////////////////////////////////////
 
 Point GameBoard::GetTileSize() const
 {
@@ -125,8 +130,6 @@ bool GameBoard::init()
     static_cast<SpriteBatchNode*>(child)->getTexture()->setAntiAliasTexParameters();
   }
 
-  CopyLayerState(_dynamic, _game_state);
-
   this->addChild(_tileMap);
 
 
@@ -154,9 +157,13 @@ bool GameBoard::init()
   _player->initWithFile("Player.png");
   setPlayerPosition(start_pos);
 
-
   this->addChild(_player);
   this->setViewPointCenter(_player->getPosition());
+
+  _game_state.plater_pos = start_pos;
+  CopyLayerState(_dynamic, _game_state.dynamic_layer);
+  RerunTriggers();
+
 
   /*
   auto listener = EventListenerMouse::create();
@@ -237,7 +244,9 @@ void GameBoard::on_key_down(EventKeyboard::KeyCode keyCode, Event* event)
     new_pos.y--;
     break;
   case EventKeyboard::KeyCode::KEY_ENTER:
-    RestoreLayerState(_foreground, _game_state);
+	this->setPlayerPosition(_game_state.plater_pos);
+    RestoreLayerState(_dynamic, _game_state.dynamic_layer);
+	RerunTriggers();
   default:
     return;
   }
@@ -294,6 +303,25 @@ this->setViewPointCenter(_player->getPosition());
 Point GameBoard::getTileCoord(const Point2D& position) const
 {
   return Point(position.x, _tileMap->getMapSize().height - 1 - position.y);
+}
+
+
+void GameBoard::RerunTriggers()
+{
+	for (auto trigger : _exit_trigger) {
+		trigger.second.Triggger(_dynamic);
+	}
+	for (int row = 0; row < _dynamic->getLayerSize().height; row++) {
+		for (int col = 0; col < _dynamic->getLayerSize().width; col++) {
+			Point2D position = Point2D(col, row);
+			Point tile_coord = getTileCoord(position);
+			int gid = _dynamic->getTileGIDAt(tile_coord);
+			if (IsAtribute(_tileMap, gid, "Solid")) {
+				CheckEnter(position);
+			}
+		}
+	}
+	CheckEnter(_player_pos);
 }
 
 void GameBoard::CheckEnter(const Point2D& position)

@@ -46,7 +46,7 @@
    </properties>
   </tile>
  </tileset>
- <layer name="Background" width="16" height="16" visible="0">
+ <layer name="Background" width="16" height="16">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -66,7 +66,7 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
- <layer name="Foreground" width="16" height="16" visible="0">
+ <layer name="Foreground" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -86,7 +86,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="Dynamic" width="16" height="16" visible="0">
+ <layer name="Dynamic" width="16" height="16">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -106,7 +106,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="Meta" visible="0">
+ <objectgroup name="Meta">
   <object id="1" name="SpawnPoint" x="40" y="229" width="15" height="18"/>
   <object id="2" name="GreenButton" x="6" y="233" width="19" height="15">
    <properties>

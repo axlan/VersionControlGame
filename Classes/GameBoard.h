@@ -4,9 +4,6 @@
 #include "HudLayer.h"
 #include "Util.h"
 
-typedef std::unordered_map<int, int> Map2D;
-
-
 struct TriggerCmd
 {
   enum class Type
@@ -29,6 +26,16 @@ private:
 
 typedef std::unordered_map<uint64_t, TriggerCmd> TriggerMap;
 
+
+typedef std::unordered_map<int, int> Map2D;
+
+struct GameState
+{
+	Map2D dynamic_layer;
+	Point2D plater_pos;
+};
+
+
 class GameBoard : public cocos2d::Node
 {
 public:
@@ -42,7 +49,7 @@ public:
   void on_key_down(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
 private:
-  Map2D _game_state;
+  GameState _game_state;
   cocos2d::TMXTiledMap *_tileMap;
   cocos2d::TMXLayer *_background;
   cocos2d::TMXLayer *_foreground;
@@ -62,4 +69,5 @@ private:
   Point getTileCoord(const Point2D& position) const;
   bool IsTileInbounds(const Point2D& position);
   void setViewPointCenter(cocos2d::Point position);
+  void RerunTriggers();
 };
