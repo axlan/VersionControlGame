@@ -51,8 +51,10 @@ public:
 
   void set_graph_node(GraphNode* graph_node);
 
+  void RestoreGameState(GameState& state);
+
 private:
-  GameState _game_state;
+
   cocos2d::TMXTiledMap *_tileMap;
   cocos2d::TMXLayer *_background;
   cocos2d::TMXLayer *_foreground;

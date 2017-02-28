@@ -63,6 +63,7 @@ bool HelloWorld::init()
     myBoard->setContentSize(cocos2d::Size(512, 512));
     myBoard->setPosition(cocos2d::Vec2(0, 200));
 	myBoard->set_graph_node(myGraph);
+	myGraph->set_game_board(myBoard);
     this->addChild(myBoard);
     
     return true;

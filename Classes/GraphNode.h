@@ -6,6 +6,7 @@ class TestNode;
 typedef std::shared_ptr<TestNode> TestNodePtr;
 
 struct GameState;
+class GameBoard;
 
 class GraphNode : public cocos2d::Node
 {
@@ -21,6 +22,8 @@ public:
   void AddGameState(const GameState& state);
   void UpdateGameState(const GameState& state);
 
+  void set_game_board(GameBoard* board);
+
 private:
   void update_nodes();
   cocos2d::DrawNode *boundLines;
@@ -28,5 +31,7 @@ private:
   std::unordered_map<uint64_t, TestNodePtr> point_map;
 
   TestNodePtr _selected;
+
+  GameBoard* _game_board;
 
 };

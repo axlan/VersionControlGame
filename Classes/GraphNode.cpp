@@ -28,13 +28,13 @@ public:
     return children_;
   }
 
-  TestNodePtr AddChild()
+  TestNodePtr AddChild(TestNodePtr smart_this)
   {
     auto& branches = *branches_;
     if (branches.size() > t_ + 1 && branches[t_ + 1] == max_branches_) {
       return nullptr;
     }
-    TestNodePtr child(new TestNode(this));
+    TestNodePtr child(new TestNode(smart_this));
     children_.push_back(child);
     return child;
   }
@@ -62,7 +62,14 @@ public:
     return parent_->branch_id_;
   }
 
+  TestNodePtr GetParent()
+  {
+	  return parent_;
+  }
+
   GameState game_state;
+
+
 
 protected:
   TestNode(int max_branches) : max_branches_(max_branches), parent_(nullptr), t_(0)
@@ -70,7 +77,7 @@ protected:
     branches_ = std::make_shared<std::vector<int>>();
     branches_->push_back(1);
   }
-  TestNode(TestNode* parent) : max_branches_(parent->max_branches_), parent_(parent), t_(parent->t_ + 1), branches_(parent->branches_)
+  TestNode(TestNodePtr parent) : max_branches_(parent->max_branches_), parent_(parent), t_(parent->t_ + 1), branches_(parent->branches_)
   {
     auto& branches = *branches_;
     if (branches.size() <= t_) {
@@ -83,7 +90,7 @@ protected:
 
   const int max_branches_;
   std::shared_ptr<std::vector<int>> branches_;
-  TestNode* parent_;
+  TestNodePtr parent_;
   std::list<TestNodePtr> children_;
   int t_;
 };
@@ -96,7 +103,10 @@ protected:
 
 USING_NS_CC;
 
-
+void GraphNode::set_game_board(GameBoard* board)
+{
+	_game_board = board;
+}
 
 
 
@@ -109,7 +119,7 @@ bool GraphNode::init()
 	{
 		return false;
 	}
-
+	_game_board = nullptr;
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -153,6 +163,12 @@ static Point2D Pixel2Point(int x, int y)
   return Pixel2Point(x, y, offset, offset, x_space, y_space);
 }
 
+template <class T>
+static bool PtrEqual(T a, T b)
+{
+	return a.get() == b.get();
+}
+
 void GraphNode::on_mouse_down(cocos2d::Event* event) {
   try {
     EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
@@ -172,9 +188,15 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
 
     if (point_map.count(key) > 0) {
       if (mouseEvent->getMouseButton() == MOUSE_BUTTON_LEFT) {
-        point_map[key]->AddChild();
+		  _selected = point_map[key];
+		  _game_board->RestoreGameState(_selected->game_state);
       }
       else {
+		TestNodePtr target = point_map[key];
+		if (PtrEqual(target, _selected)) {
+		  _selected = _selected->GetParent();
+		  _game_board->RestoreGameState(_selected->game_state);
+		}
         point_map[key]->Delete();
       }
 	  update_nodes();
@@ -203,7 +225,7 @@ void GraphNode::UpdateGameState(const GameState& state)
 
 void GraphNode::AddGameState(const GameState& state)
 {
-	_selected = _selected->AddChild();
+	_selected = _selected->AddChild(_selected);
 	_selected->game_state = state;
 	update_nodes();
 }
@@ -243,7 +265,14 @@ void GraphNode::update_nodes() {
       point_map[key] = parent;
       parent->branch_id_ = y;
       Vec2 pos(offset + x_space * x, offset + y_space * y);
-      boundLines->drawDot(pos, radius, Color4F(1.0, 0.0, 1.0, 1.0));
+	  Color4F color;
+	  if (PtrEqual(parent, _selected)) {
+		  color = Color4F(1.0, 0.0, 1.0, 1.0);
+	  }
+	  else {
+		  color = Color4F(0.0, 1.0, 1.0, 1.0);
+	  }
+      boundLines->drawDot(pos, radius, color);
       if (x > 0) {
         Vec2 parent_pos(offset + x_space * (x - 1), offset + y_space * (parent->GetParentBranchID()));
         boundLines->drawLine(pos, parent_pos, Color4F(1.0, 1.0, 0.0, 1.0));

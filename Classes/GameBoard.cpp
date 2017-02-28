@@ -90,6 +90,13 @@ Point TriggerCmd::ParsePoint(const std::string& word)
 
 ///////////////////////////////////////////////////GameBoard///////////////////////////////////////////////////
 
+void GameBoard::RestoreGameState(GameState& state)
+{
+	this->setPlayerPosition(state.plater_pos);
+	RestoreLayerState(_dynamic, state.dynamic_layer);
+	RerunTriggers();
+}
+
 Point GameBoard::GetTileSize() const
 {
   Point scale = GetWorldToNodeScale(this);
@@ -104,12 +111,15 @@ Point2D GameBoard::BoardPixel2Point(int x, int y) const
   return Pixel2Point(x, y, 0, 0, tile_size.x, tile_size.y);
 }
 
+
+
 void GameBoard::set_graph_node(GraphNode* graph_node)
 {
 	_graph_node = graph_node;
-	_game_state.plater_pos = _player_pos;
-	CopyLayerState(_dynamic, _game_state.dynamic_layer);
-	_graph_node->UpdateGameState(_game_state);
+	GameState game_state;
+	game_state.plater_pos = _player_pos;
+	CopyLayerState(_dynamic, game_state.dynamic_layer);
+	_graph_node->UpdateGameState(game_state);
 }
 
 // on "init" you need to initialize your instance
@@ -232,6 +242,8 @@ bool GameBoard::IsTileInbounds(const Point2D& position)
     position.x >= 0);
 }
 
+
+
 void GameBoard::on_key_down(EventKeyboard::KeyCode keyCode, Event* event)
 {
   Point2D new_pos = _player_pos;
@@ -253,10 +265,6 @@ void GameBoard::on_key_down(EventKeyboard::KeyCode keyCode, Event* event)
   case EventKeyboard::KeyCode::KEY_S:
     new_pos.y--;
     break;
-  case EventKeyboard::KeyCode::KEY_ENTER:
-	this->setPlayerPosition(_game_state.plater_pos);
-    RestoreLayerState(_dynamic, _game_state.dynamic_layer);
-	RerunTriggers();
   default:
     return;
   }
@@ -264,9 +272,10 @@ void GameBoard::on_key_down(EventKeyboard::KeyCode keyCode, Event* event)
   if (IsTileInbounds(new_pos))
   {
     this->setPlayerPosition(new_pos);
-	_game_state.plater_pos = _player_pos;
-	CopyLayerState(_dynamic, _game_state.dynamic_layer);
-	_graph_node->AddGameState(_game_state);
+	GameState game_state;
+	game_state.plater_pos = _player_pos;
+	CopyLayerState(_dynamic, game_state.dynamic_layer);
+	_graph_node->AddGameState(game_state);
   }
 
   this->setViewPointCenter(_player->getPosition());
