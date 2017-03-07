@@ -9,6 +9,7 @@
   </tile>
   <tile id="1">
    <properties>
+    <property name="Mergeable" type="bool" value="true"/>
     <property name="Push" type="bool" value="true"/>
     <property name="Solid" type="bool" value="true"/>
    </properties>
@@ -106,7 +107,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="Meta">
+ <objectgroup name="Meta" visible="0">
   <object id="1" name="SpawnPoint" x="40" y="229" width="15" height="18"/>
   <object id="2" name="GreenButton" x="6" y="233" width="19" height="15">
    <properties>

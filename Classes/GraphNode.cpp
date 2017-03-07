@@ -18,25 +18,27 @@ typedef std::list<TestNodePtr> TestNodePtrList;
 class TestNode
 {
 public:
-  static TestNodePtr MakeRoot(int max_branches)
+  static TestNodePtr MakeRoot(int max_branches, int max_t)
   {
-    return TestNodePtr(new TestNode(max_branches));
+    return TestNodePtr(new TestNode(max_branches, max_t));
   }
+
+  static TestNodePtr AddChild(TestNodePtr smart_this)
+  {
+	  auto& branches = *smart_this->branches_;
+	  int new_t = smart_this->t_ + 1;
+	  if (new_t >= smart_this->max_t_ || (branches.size() > new_t && branches[new_t] == smart_this->max_branches_)) {
+		  return nullptr;
+	  }
+	  TestNodePtr child(new TestNode(smart_this));
+	  smart_this->children_.push_back(child);
+	  return child;
+  }
+
 
   const TestNodePtrList& GetChildren()
   {
     return children_;
-  }
-
-  TestNodePtr AddChild(TestNodePtr smart_this)
-  {
-    auto& branches = *branches_;
-    if (branches.size() > t_ + 1 && branches[t_ + 1] == max_branches_) {
-      return nullptr;
-    }
-    TestNodePtr child(new TestNode(smart_this));
-    children_.push_back(child);
-    return child;
   }
 
   bool Delete()
@@ -72,12 +74,12 @@ public:
 
 
 protected:
-  TestNode(int max_branches) : max_branches_(max_branches), parent_(nullptr), t_(0)
+  TestNode(int max_branches, int max_t) : max_branches_(max_branches), max_t_(max_t), parent_(nullptr), t_(0)
   {
     branches_ = std::make_shared<std::vector<int>>();
     branches_->push_back(1);
   }
-  TestNode(TestNodePtr parent) : max_branches_(parent->max_branches_), parent_(parent), t_(parent->t_ + 1), branches_(parent->branches_)
+  TestNode(TestNodePtr parent) : max_branches_(parent->max_branches_), max_t_(parent->max_t_), parent_(parent), t_(parent->t_ + 1), branches_(parent->branches_)
   {
     auto& branches = *branches_;
     if (branches.size() <= t_) {
@@ -89,6 +91,7 @@ protected:
   }
 
   const int max_branches_;
+  const int max_t_;
   std::shared_ptr<std::vector<int>> branches_;
   TestNodePtr parent_;
   std::list<TestNodePtr> children_;
@@ -103,9 +106,10 @@ protected:
 
 USING_NS_CC;
 
-void GraphNode::set_game_board(GameBoard* board)
+void GraphNode::set_game_boards(GameBoard* current, GameBoard* last)
 {
-	_game_board = board;
+	_current_game_board = current;
+	_last_game_board = last;
 }
 
 
@@ -119,7 +123,8 @@ bool GraphNode::init()
 	{
 		return false;
 	}
-	_game_board = nullptr;
+	_current_game_board = nullptr;
+	_last_game_board = nullptr;
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -127,8 +132,9 @@ bool GraphNode::init()
   this->addChild(boundLines);
 
 
-  root = TestNode::MakeRoot(7);
+  root = TestNode::MakeRoot(7, 25);
 
+  _prev_selected = nullptr;
   _selected = root;
 
 
@@ -188,14 +194,19 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
 
     if (point_map.count(key) > 0) {
       if (mouseEvent->getMouseButton() == MOUSE_BUTTON_LEFT) {
+		  _last_game_board->RestoreGameState(_selected->game_state);
+		  _prev_selected = _selected;
 		  _selected = point_map[key];
-		  _game_board->RestoreGameState(_selected->game_state);
+		  _current_game_board->RestoreGameState(_selected->game_state);
       }
       else {
 		TestNodePtr target = point_map[key];
+		if (PtrEqual(target, _prev_selected)) {
+			_prev_selected = nullptr;
+		}
 		if (PtrEqual(target, _selected)) {
 		  _selected = _selected->GetParent();
-		  _game_board->RestoreGameState(_selected->game_state);
+		  _current_game_board->RestoreGameState(_selected->game_state);
 		}
         point_map[key]->Delete();
       }
@@ -220,14 +231,20 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
 void GraphNode::UpdateGameState(const GameState& state)
 {
 	_selected->game_state = state;
-
 }
 
 void GraphNode::AddGameState(const GameState& state)
 {
-	_selected = _selected->AddChild(_selected);
-	_selected->game_state = state;
-	update_nodes();
+	TestNodePtr attempt = TestNode::AddChild(_selected);
+	if (attempt) {
+		_selected = attempt;
+		_selected->game_state = state;
+		update_nodes();
+	}
+	else {
+		_current_game_board->RestoreGameState(_selected->game_state);
+	}
+
 }
 
 void GraphNode::update_nodes() {
@@ -268,6 +285,9 @@ void GraphNode::update_nodes() {
 	  Color4F color;
 	  if (PtrEqual(parent, _selected)) {
 		  color = Color4F(1.0, 0.0, 1.0, 1.0);
+	  }
+	  else if (PtrEqual(parent, _prev_selected)) {
+		  color = Color4F(1.0, 1.0, 0.0, 1.0);
 	  }
 	  else {
 		  color = Color4F(0.0, 1.0, 1.0, 1.0);

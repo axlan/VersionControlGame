@@ -49,11 +49,13 @@ public:
   //virtual void on_mouse_down(cocos2d::Event* event);
   void on_key_down(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 
-  void set_graph_node(GraphNode* graph_node);
+  void EnableInput(GraphNode* graph_node);
 
   void RestoreGameState(GameState& state);
 
 private:
+
+  void DrawBounds(cocos2d::Color4F color);
 
   cocos2d::TMXTiledMap *_tileMap;
   cocos2d::TMXLayer *_background;
@@ -76,4 +78,5 @@ private:
   void setViewPointCenter(cocos2d::Point position);
   void RerunTriggers();
   GraphNode* _graph_node;
+  cocos2d::DrawNode *boundLines;
 };

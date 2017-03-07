@@ -59,12 +59,21 @@ bool HelloWorld::init()
     myGraph->setPosition(cocos2d::Vec2(0, 0));
     this->addChild(myGraph);
 
-    auto myBoard = GameBoard::create();
-    myBoard->setContentSize(cocos2d::Size(512, 512));
-    myBoard->setPosition(cocos2d::Vec2(0, 200));
-	myBoard->set_graph_node(myGraph);
-	myGraph->set_game_board(myBoard);
-    this->addChild(myBoard);
+    auto main_board = GameBoard::create();
+	main_board->setContentSize(cocos2d::Size(512, 512));
+	main_board->setPosition(cocos2d::Vec2(528, 200));
+	this->addChild(main_board);
+
+	auto last_board = GameBoard::create();
+	last_board->setContentSize(cocos2d::Size(512, 512));
+	last_board->setPosition(cocos2d::Vec2(0, 200));
+	this->addChild(last_board);
+
+	myGraph->set_game_boards(main_board, last_board);
+	main_board->EnableInput(myGraph);
+	
+
+	
     
     return true;
 }

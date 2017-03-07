@@ -22,6 +22,14 @@ struct Point2D
   {
     return Point2D(x - rhs.x, y - rhs.y); // return the result by value (uses move constructor)
   }
+  bool operator==(const Point2D& other) const
+  {
+	  return x == other.x && y == other.y;
+  }
+  bool operator!=(const Point2D& other) const
+  {
+	  return !(*this == other);
+  }
 };
 
 Point2D Pixel2Point(float x, float y, float offset_x, float offset_y, float width, float height);

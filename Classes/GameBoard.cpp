@@ -111,17 +111,6 @@ Point2D GameBoard::BoardPixel2Point(int x, int y) const
   return Pixel2Point(x, y, 0, 0, tile_size.x, tile_size.y);
 }
 
-
-
-void GameBoard::set_graph_node(GraphNode* graph_node)
-{
-	_graph_node = graph_node;
-	GameState game_state;
-	game_state.plater_pos = _player_pos;
-	CopyLayerState(_dynamic, game_state.dynamic_layer);
-	_graph_node->UpdateGameState(game_state);
-}
-
 // on "init" you need to initialize your instance
 bool GameBoard::init()
 {
@@ -184,6 +173,8 @@ bool GameBoard::init()
 
   RerunTriggers();
 
+  boundLines = DrawNode::create();
+  this->addChild(boundLines);
 
   /*
   auto listener = EventListenerMouse::create();
@@ -192,20 +183,31 @@ bool GameBoard::init()
   */
 
 
-  auto eventListener = EventListenerKeyboard::create();
-  eventListener->onKeyPressed = CC_CALLBACK_2(GameBoard::on_key_down, this);
-  this->_eventDispatcher->addEventListenerWithFixedPriority(eventListener, 1);
-
-  auto listener = EventListenerMouse::create();
-  listener->onMouseDown = CC_CALLBACK_1(GameBoard::on_mouse_down, this);
-  listener->onMouseMove = [](cocos2d::Event* event) { };
-  listener->onMouseScroll = [](cocos2d::Event* event) {};
-  listener->onMouseUp = [](cocos2d::Event* event) { };
-  _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
 
   return true;
 }
 
+void GameBoard::EnableInput(GraphNode* graph_node)
+{
+	_graph_node = graph_node;
+	GameState game_state;
+	game_state.plater_pos = _player_pos;
+	CopyLayerState(_dynamic, game_state.dynamic_layer);
+	_graph_node->UpdateGameState(game_state);
+
+	DrawBounds(Color4F(1.0, 0.0, 1.0, 1.0));
+
+	auto eventListener = EventListenerKeyboard::create();
+	eventListener->onKeyPressed = CC_CALLBACK_2(GameBoard::on_key_down, this);
+	this->_eventDispatcher->addEventListenerWithFixedPriority(eventListener, 1);
+
+	auto listener = EventListenerMouse::create();
+	listener->onMouseDown = CC_CALLBACK_1(GameBoard::on_mouse_down, this);
+	listener->onMouseMove = [](cocos2d::Event* event) { };
+	listener->onMouseScroll = [](cocos2d::Event* event) {};
+	listener->onMouseUp = [](cocos2d::Event* event) { };
+	_eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
+}
 
 void GameBoard::on_mouse_down(cocos2d::Event* event) {
   try {
@@ -265,13 +267,17 @@ void GameBoard::on_key_down(EventKeyboard::KeyCode keyCode, Event* event)
   case EventKeyboard::KeyCode::KEY_S:
     new_pos.y--;
     break;
+  case EventKeyboard::KeyCode::KEY_SPACE:
+	  break;
   default:
     return;
   }
   // safety check on the bounds of the map
   if (IsTileInbounds(new_pos))
   {
-    this->setPlayerPosition(new_pos);
+	if (new_pos != _player_pos) {
+		this->setPlayerPosition(new_pos);
+	}
 	GameState game_state;
 	game_state.plater_pos = _player_pos;
 	CopyLayerState(_dynamic, game_state.dynamic_layer);
@@ -401,6 +407,20 @@ void GameBoard::setPlayerPosition(const Point2D &position)
   Point tile_size = GetTileSize();
   _player->setPosition(position.x * tile_size.x + tile_size.x / 2, position.y * tile_size.y + tile_size.y / 2);
 
+}
+
+void GameBoard::DrawBounds(cocos2d::Color4F color)
+{
+	boundLines->clear();
+
+	auto bounds = this->getContentSize();
+	int max_x = bounds.width - 1;
+	int max_y = bounds.height - 1;
+
+	boundLines->drawLine(Vec2(0, 0), Vec2(0, max_y), color);
+	boundLines->drawLine(Vec2(0, 0), Vec2(max_x, 0), color);
+	boundLines->drawLine(Vec2(max_x, max_y), Vec2(0, max_y), color);
+	boundLines->drawLine(Vec2(max_x, max_y), Vec2(max_x, 0), color);
 }
 
 void GameBoard::setViewPointCenter(Point position)

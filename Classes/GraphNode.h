@@ -22,7 +22,7 @@ public:
   void AddGameState(const GameState& state);
   void UpdateGameState(const GameState& state);
 
-  void set_game_board(GameBoard* board);
+  void set_game_boards(GameBoard* current, GameBoard* last);
 
 private:
   void update_nodes();
@@ -31,7 +31,11 @@ private:
   std::unordered_map<uint64_t, TestNodePtr> point_map;
 
   TestNodePtr _selected;
+  TestNodePtr _prev_selected;
 
-  GameBoard* _game_board;
+  GameBoard* _current_game_board;
+  GameBoard* _last_game_board;
+
+
 
 };
