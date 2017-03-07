@@ -54,10 +54,10 @@ bool HelloWorld::init()
     this->addChild(menu, 1);
 
 
-    auto myGraph = GraphNode::create();
-    myGraph->setContentSize(cocos2d::Size(800, 200));
-    myGraph->setPosition(cocos2d::Vec2(0, 0));
-    this->addChild(myGraph);
+	_graph_node = GraphNode::create();
+	_graph_node->setContentSize(cocos2d::Size(800, 200));
+	_graph_node->setPosition(cocos2d::Vec2(0, 0));
+    this->addChild(_graph_node);
 
     auto main_board = GameBoard::create();
 	main_board->setContentSize(cocos2d::Size(512, 512));
@@ -69,18 +69,16 @@ bool HelloWorld::init()
 	last_board->setPosition(cocos2d::Vec2(0, 200));
 	this->addChild(last_board);
 
-	myGraph->set_game_boards(main_board, last_board);
-	main_board->EnableInput(myGraph);
+	_graph_node->set_game_boards(main_board, last_board);
+	main_board->EnableInput(_graph_node);
 	
-
-	
-    
     return true;
 }
 
 
 void HelloWorld::menuCloseCallback(Ref* pSender)
-{/*
+{
+	/*
 	cocos2d::log("%d %d\n", pSender->_ID, pSender);
     //Close the cocos2d-x game scene and quit the application
     Director::getInstance()->end();
@@ -89,20 +87,7 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     exit(0);
 #endif
 */
-
-// add a "close" icon to exit the progress. it's an autorelease object
-	auto closeItem = MenuItemImage::create(
-		"CloseNormal.png",
-		"CloseSelected.png",
-		CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
-
-	closeItem->setPosition(Vec2(dynamic_cast<MenuItemImage*>(pSender)->getPositionX()-50, dynamic_cast<MenuItemImage*>(pSender)->getPositionY()));
-
-	// create menu, it's an autorelease object
-	auto menu = Menu::create(closeItem, NULL);
-	menu->setPosition(Vec2::ZERO);
-	this->addChild(menu, 1);
+	_graph_node->Merge();
 
     
     /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() and exit(0) as given above,instead trigger a custom event created in RootViewController.mm as below*/

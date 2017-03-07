@@ -35,6 +35,23 @@ public:
 	  return child;
   }
 
+  static TestNodePtr Merge(TestNodePtr a, TestNodePtr b)
+  {
+	  if (!a || !b || a->t_ != b->t_) {
+		  return nullptr;
+	  }
+	  auto& branches = *a->branches_;
+	  int new_t = a->t_ + 1;
+	  if (new_t >= a->max_t_ || (branches.size() > new_t && branches[new_t] == a->max_branches_)) {
+		  return nullptr;
+	  }
+	  TestNodePtr child(new TestNode(a));
+	  child->parent2_ = b;
+	  a->children_.push_back(child);
+	  b->children_.push_back(child);
+	  return child;
+  }
+
 
   const TestNodePtrList& GetChildren()
   {
@@ -43,30 +60,31 @@ public:
 
   bool Delete()
   {
-    if (children_.size() > 0 || !parent_) {
+    if (children_.size() > 0 || !parent1_) {
       return false;
     }
     (*branches_)[t_]--;
-    for (auto iterator = parent_->children_.begin(); iterator != parent_->children_.end(); ++iterator) {
-      TestNodePtr& child = *iterator;
-      if (child.get() == this) {
-        parent_->children_.remove(child);
-        return true;
-      }
-    }
-    assert(false);
+	parent1_->RemoveChild(this);
+	if (parent2_) {
+		parent2_->RemoveChild(this);
+	}
   }
 
   int branch_id_ = -1;
 
-  int GetParentBranchID()
+  std::vector<int> GetParentBranchIDs()
   {
-    return parent_->branch_id_;
+	std::vector<int> parent_ids;
+	parent_ids.push_back(parent1_->branch_id_);
+	if (parent2_) {
+		parent_ids.push_back(parent2_->branch_id_);
+	}
+    return parent_ids;
   }
 
   TestNodePtr GetParent()
   {
-	  return parent_;
+	  return parent1_;
   }
 
   GameState game_state;
@@ -74,12 +92,25 @@ public:
 
 
 protected:
-  TestNode(int max_branches, int max_t) : max_branches_(max_branches), max_t_(max_t), parent_(nullptr), t_(0)
+
+  void RemoveChild(const TestNode* target)
+  {
+	  for (auto iterator = this->children_.begin(); iterator != this->children_.end(); ++iterator) {
+		  TestNodePtr& child = *iterator;
+		  if (child.get() == target) {
+			  this->children_.remove(child);
+			  return;
+		  }
+	  }
+	  assert(false);
+  }
+
+  TestNode(int max_branches, int max_t) : max_branches_(max_branches), max_t_(max_t), parent1_(nullptr), parent2_(nullptr), t_(0)
   {
     branches_ = std::make_shared<std::vector<int>>();
     branches_->push_back(1);
   }
-  TestNode(TestNodePtr parent) : max_branches_(parent->max_branches_), max_t_(parent->max_t_), parent_(parent), t_(parent->t_ + 1), branches_(parent->branches_)
+  TestNode(TestNodePtr parent) : max_branches_(parent->max_branches_), max_t_(parent->max_t_), parent1_(parent), parent2_(nullptr), t_(parent->t_ + 1), branches_(parent->branches_)
   {
     auto& branches = *branches_;
     if (branches.size() <= t_) {
@@ -93,7 +124,8 @@ protected:
   const int max_branches_;
   const int max_t_;
   std::shared_ptr<std::vector<int>> branches_;
-  TestNodePtr parent_;
+  TestNodePtr parent1_;
+  TestNodePtr parent2_;
   std::list<TestNodePtr> children_;
   int t_;
 };
@@ -194,6 +226,9 @@ void GraphNode::on_mouse_down(cocos2d::Event* event) {
 
     if (point_map.count(key) > 0) {
       if (mouseEvent->getMouseButton() == MOUSE_BUTTON_LEFT) {
+		  if (PtrEqual(point_map[key], _selected)) {
+			  return;
+		  }
 		  _last_game_board->RestoreGameState(_selected->game_state);
 		  _prev_selected = _selected;
 		  _selected = point_map[key];
@@ -244,7 +279,16 @@ void GraphNode::AddGameState(const GameState& state)
 	else {
 		_current_game_board->RestoreGameState(_selected->game_state);
 	}
+}
 
+void GraphNode::Merge() {
+	TestNodePtr attempt = TestNode::Merge(_selected, _prev_selected);
+	if (attempt) {
+		attempt->game_state = _selected->game_state;
+		_selected = attempt;
+		_current_game_board->RestoreGameState(_selected->game_state);
+		update_nodes();
+	}
 }
 
 void GraphNode::update_nodes() {
@@ -259,9 +303,6 @@ void GraphNode::update_nodes() {
   boundLines->drawLine(Vec2(0, 0), Vec2(max_x, 0), Color4F(1.0, 0.0, 1.0, 1.0));
   boundLines->drawLine(Vec2(max_x, max_y), Vec2(0, max_y), Color4F(1.0, 0.0, 1.0, 1.0));
   boundLines->drawLine(Vec2(max_x, max_y), Vec2(max_x, 0), Color4F(1.0, 0.0, 1.0, 1.0));
-
-
-
 
   auto nodes = std::list<TestNodePtr>();
 
@@ -294,25 +335,23 @@ void GraphNode::update_nodes() {
 	  }
       boundLines->drawDot(pos, radius, color);
       if (x > 0) {
-        Vec2 parent_pos(offset + x_space * (x - 1), offset + y_space * (parent->GetParentBranchID()));
-        boundLines->drawLine(pos, parent_pos, Color4F(1.0, 1.0, 0.0, 1.0));
+		auto ids = parent->GetParentBranchIDs();
+		for (auto id : ids) {
+			Vec2 parent_pos(offset + x_space * (x - 1), offset + y_space * (id));
+			boundLines->drawLine(pos, parent_pos, Color4F(1.0, 1.0, 0.0, 1.0));
+		}
       }
       for each (auto& child in parent->GetChildren())
       {
-        next_nodes.push_back(child);
+		//check if this is the second parent of a merge
+		auto found_iter = std::find(next_nodes.begin(), next_nodes.end(), child);
+		if (found_iter == next_nodes.end()) {
+			next_nodes.push_back(child);
+		}
       }
       y++;
     }
     x++;
     nodes = next_nodes;
   }
-
-
-
-
-
-
-
-
-
 }

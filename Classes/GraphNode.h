@@ -24,6 +24,8 @@ public:
 
   void set_game_boards(GameBoard* current, GameBoard* last);
 
+  void Merge();
+
 private:
   void update_nodes();
   cocos2d::DrawNode *boundLines;
