@@ -24,7 +24,8 @@ public:
 
   void set_game_boards(GameBoard* current, GameBoard* last);
 
-  void Merge();
+  void StartMerge();
+  void StopMerge(const GameState& state);
 
 private:
   void update_nodes();
@@ -37,7 +38,7 @@ private:
 
   GameBoard* _current_game_board;
   GameBoard* _last_game_board;
-
+  bool _merging;
 
 
 };

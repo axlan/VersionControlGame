@@ -13,6 +13,9 @@ struct Point2D
   Point2D(int32_t x, int32_t y):x(x),y(y)
   {
   }
+  Point2D(const cocos2d::Point &point) :x(point.x), y(point.y)
+  {
+  }
 
   Point2D operator+(const Point2D& rhs) const
   {
@@ -29,6 +32,10 @@ struct Point2D
   bool operator!=(const Point2D& other) const
   {
 	  return !(*this == other);
+  }
+  operator cocos2d::Point() const
+  {
+	  return  cocos2d::Point(x, y);
   }
 };
 

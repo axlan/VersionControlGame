@@ -24,6 +24,24 @@ private:
 
 };
 
+struct MergeTile
+{
+	enum class SelectedBy
+	{
+		NEITHER,
+		SELF,
+		OTHER
+	};
+	int gid;
+	Point2D position;
+	SelectedBy selected;
+
+	MergeTile() : gid(0), position(Point(0, 0)), selected(SelectedBy::NEITHER){}
+	MergeTile(const Point2D &position) : gid(0), position(position), selected(SelectedBy::NEITHER) {}
+	MergeTile(int gid, const Point2D &position) : gid(gid), position(position), selected(SelectedBy::NEITHER) {}
+
+};
+
 typedef std::unordered_map<uint64_t, TriggerCmd> TriggerMap;
 
 
@@ -53,6 +71,9 @@ public:
 
   void RestoreGameState(GameState& state);
 
+  void StartMerge(GameBoard * other);
+  void StopMerge();
+
 private:
 
   void DrawBounds(cocos2d::Color4F color);
@@ -68,6 +89,9 @@ private:
   int _numCollected;
   Point2D _player_pos;
 
+  void DrawMergeTile(const MergeTile &tile);
+  void SelectedOtherMergeCandidate(int selected_gid);
+
   void CheckEnter(const Point2D& position);
   void CheckExit(const Point2D& position);
   Point2D BoardPixel2Point(int x, int y) const;
@@ -79,4 +103,7 @@ private:
   void RerunTriggers();
   GraphNode* _graph_node;
   cocos2d::DrawNode *boundLines;
+  bool _merging;
+  GameBoard * _merge_pair;
+  std::list<MergeTile> _merge_tiles;
 };
