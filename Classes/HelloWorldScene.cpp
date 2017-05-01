@@ -2,6 +2,9 @@
 #include "GraphNode.h"
 #include "SimpleAudioEngine.h"
 #include "GameBoard.h"
+#include <ui/UIText.h>
+#include <ui/UIButton.h>
+#include <ui/UIWidget.h>
 
 USING_NS_CC;
 
@@ -29,30 +32,6 @@ bool HelloWorld::init()
     {
         return false;
     }
-    
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-
-	  cocos2d::log("%d %d\n", closeItem->_ID, closeItem);
-    
-    closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));
-
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-
 
 	_graph_node = GraphNode::create();
 	_graph_node->setContentSize(cocos2d::Size(800, 200));
@@ -60,40 +39,87 @@ bool HelloWorld::init()
     this->addChild(_graph_node);
 
     auto main_board = GameBoard::create();
-	main_board->setContentSize(cocos2d::Size(512, 512));
-	main_board->setPosition(cocos2d::Vec2(528, 200));
+	main_board->setPositionRect(Rect(528, 200, 512, 512));
 	this->addChild(main_board);
 
 	auto last_board = GameBoard::create();
-	last_board->setContentSize(cocos2d::Size(512, 512));
-	last_board->setPosition(cocos2d::Vec2(0, 200));
+	last_board->setPositionRect(Rect(0, 200, 512, 512));
 	this->addChild(last_board);
 
 	_graph_node->set_game_boards(main_board, last_board);
 	main_board->EnableInput(_graph_node);
+
+
+    Point offset = Point(832, 20);
+    check_box_sel = ui::CheckBox::create("check_en_1_sel_0.png",
+        "check_en_1_sel_0.png",
+        "check_en_1_sel_1.png",
+        "check_en_0_sel_0.png",
+        "check_en_0_sel_1.png");
+    check_box_sel->setPosition(offset);
+    check_box_sel->addEventListener(CC_CALLBACK_2(HelloWorld::check_box_callback, this));
+    this->addChild(check_box_sel);
+    auto label_check_box_sel = ui::Text::create("Select", "fonts/arial.ttf", 30);
+    label_check_box_sel->setPosition(offset + Point(60, 0));
+    this->addChild(label_check_box_sel);
+
+    check_box_del = ui::CheckBox::create("check_en_1_sel_0.png",
+        "check_en_1_sel_0.png",
+        "check_en_1_sel_1.png",
+        "check_en_0_sel_0.png",
+        "check_en_0_sel_1.png");
+    check_box_del->setPosition(offset + Point(0, 36));
+    check_box_del->addEventListener(CC_CALLBACK_2(HelloWorld::check_box_callback, this));
+    this->addChild(check_box_del);
+    auto label_check_box_del = ui::Text::create("Delete", "fonts/arial.ttf", 30);
+    label_check_box_del->setPosition(offset + Point(60, 36));
+    this->addChild(label_check_box_del);
+
+    check_box_view = ui::CheckBox::create("check_en_1_sel_0.png",
+        "check_en_1_sel_0.png",
+        "check_en_1_sel_1.png",
+        "check_en_0_sel_0.png",
+        "check_en_0_sel_1.png");
+    check_box_view->setPosition(offset + Point(0, 36 * 2));
+    check_box_view->addEventListener(CC_CALLBACK_2(HelloWorld::check_box_callback, this));
+    this->addChild(check_box_view);
+    auto label_check_box_view = ui::Text::create("View", "fonts/arial.ttf", 30);
+    label_check_box_view->setPosition(offset + Point(55, 36 * 2));
+    this->addChild(label_check_box_view);
+    check_box_view->setSelected(true);
+
+
+    auto uButton = ui::Button::create();
+    uButton->setTouchEnabled(true);
+    uButton->loadTextures("CloseNormal.png", "CloseSelected.png", "");
+    uButton->setPosition(offset + Point(0, 36 * 4));
+    uButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+        if (type == ui::Widget::TouchEventType::ENDED)
+        {
+            _graph_node->StartMerge();
+        }
+    });
+    this->addChild(uButton);
+    auto label_btn_merge = ui::Text::create("Merge", "fonts/arial.ttf", 30);
+    label_btn_merge->setPosition(offset + Point(60, 36 * 4));
+    this->addChild(label_btn_merge);
+
 	
     return true;
 }
 
-
-void HelloWorld::menuCloseCallback(Ref* pSender)
+void HelloWorld::check_box_callback(cocos2d::Ref* caller, cocos2d::ui::CheckBox::EventType event)
 {
-	/*
-	cocos2d::log("%d %d\n", pSender->_ID, pSender);
-    //Close the cocos2d-x game scene and quit the application
-    Director::getInstance()->end();
-
-    #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
-*/
-	_graph_node->StartMerge();
-
-    
-    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() and exit(0) as given above,instead trigger a custom event created in RootViewController.mm as below*/
-    
-    //EventCustom customEndEvent("game_scene_close_event");
-    //_eventDispatcher->dispatchEvent(&customEndEvent);
-    
-    
+    check_box_view->setSelected(caller == check_box_view);
+    if (caller == check_box_view) {
+        _graph_node->set_click(ClickType::VIEW);
+    }
+    check_box_del->setSelected(caller == check_box_del);
+    if (caller == check_box_del) {
+        _graph_node->set_click(ClickType::DELETE);
+    }
+    check_box_sel->setSelected(caller == check_box_sel);
+    if (caller == check_box_sel) {
+        _graph_node->set_click(ClickType::SELECT);
+    }
 }

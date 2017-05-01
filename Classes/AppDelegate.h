@@ -1,16 +1,17 @@
-#ifndef  _APP_DELEGATE_H_
-#define  _APP_DELEGATE_H_
+/* Copyright (c) 2017 Axlan */
 
-#include "cocos2d.h"
+#ifndef CLASSES_APPDELEGATE_H_
+#define CLASSES_APPDELEGATE_H_
+
+#include <cocos2d.h>
 
 /**
 @brief    The cocos2d Application.
 
 Private inheritance here hides part of interface from Director.
 */
-class  AppDelegate : private cocos2d::Application
-{
-public:
+class  AppDelegate : private cocos2d::Application {
+ public:
     AppDelegate();
     virtual ~AppDelegate();
 
@@ -36,5 +37,4 @@ public:
     virtual void applicationWillEnterForeground();
 };
 
-#endif // _APP_DELEGATE_H_
-
+#endif  // CLASSES_APPDELEGATE_H_

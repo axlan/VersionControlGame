@@ -20,6 +20,6 @@ bool HudLayer::init()
 
 void HudLayer::numCollectedChanged(int numCollected)
 {
-    std::string labelCollected = std::to_string(numCollected);
+    std::string labelCollected;
     _label->setString(labelCollected.c_str());
 }

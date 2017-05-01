@@ -21,13 +21,13 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\GameBoard.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\GraphNode.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\HudLayer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\GameBoard.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Util.cpp">
@@ -44,13 +44,13 @@
     <ClInclude Include="..\Classes\HelloWorldScene.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\GameBoard.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\GraphNode.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\HudLayer.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\GameBoard.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Util.h">
