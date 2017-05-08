@@ -12,12 +12,12 @@
 
 ////////////////// CONSTANTS ///////////////////////////////////////////////////
 
-static const int x_space = 40;
-static const int y_space = 40;
-static const int radius = 20;
-static const int offset = 20;
-static const int MAX_BRANCHES = 4;
-static const int MAX_STEPS = 20;
+static const int x_space = 20;
+static const int y_space = 20;
+static const int radius = 10;
+static const int offset = 10;
+static const int MAX_BRANCHES = 6;
+static const int MAX_STEPS = 40;
 
 ////////////////// GRAPH CODE //////////////////////////////////////////////////
 

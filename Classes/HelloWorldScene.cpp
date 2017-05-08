@@ -60,6 +60,7 @@ bool HelloWorld::init()
     check_box_sel->addEventListener(CC_CALLBACK_2(HelloWorld::check_box_callback, this));
     this->addChild(check_box_sel);
     auto label_check_box_sel = ui::Text::create("Select", "fonts/arial.ttf", 30);
+    label_check_box_sel->setColor(Color3B::MAGENTA);
     label_check_box_sel->setPosition(offset + Point(60, 0));
     this->addChild(label_check_box_sel);
 
@@ -72,6 +73,7 @@ bool HelloWorld::init()
     check_box_del->addEventListener(CC_CALLBACK_2(HelloWorld::check_box_callback, this));
     this->addChild(check_box_del);
     auto label_check_box_del = ui::Text::create("Delete", "fonts/arial.ttf", 30);
+    label_check_box_del->setColor(Color3B::RED);
     label_check_box_del->setPosition(offset + Point(60, 36));
     this->addChild(label_check_box_del);
 
@@ -84,6 +86,7 @@ bool HelloWorld::init()
     check_box_view->addEventListener(CC_CALLBACK_2(HelloWorld::check_box_callback, this));
     this->addChild(check_box_view);
     auto label_check_box_view = ui::Text::create("View", "fonts/arial.ttf", 30);
+    label_check_box_view->setColor(Color3B::YELLOW);
     label_check_box_view->setPosition(offset + Point(55, 36 * 2));
     this->addChild(label_check_box_view);
     check_box_view->setSelected(true);
